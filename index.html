@@ -242,6 +242,196 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/13/leedcode1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="燕钰">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小太阳的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/13/leedcode1/" itemprop="url">leedcode1</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-13T07:59:19+08:00">
+                2018-04-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>从今天开始，博主要更新leedcode算法题啦！</p>
+<p>编程环境：Java  jdk为1.8</p>
+<p>笔者提交题目的平台为leedcode，希望和大家一起进步啊！</p>
+<h5 id="问题描述："><a href="#问题描述：" class="headerlink" title="问题描述："></a>问题描述：</h5><p>Longest Substring Without Repeating Characters<br>problem:Given a string,find the longest substring without repeating charaters.</p>
+<p>Examples:</p>
+<p>input:”abcabcabcbb” substring:”abc” output:3</p>
+<p>input:”bbbbb” subdtring:”b” output:1</p>
+<p>input:”pwwkew” substring:”wke” or “kew” output:3</p>
+<h5 id="解决思路："><a href="#解决思路：" class="headerlink" title="解决思路："></a>解决思路：</h5><p>1、笔者考虑了一下，凡是下一个字符和当前子串有重复时，我们当前子串的长度计数停止。栗子：abcabcabcbb中我们遍历到第二个a时，由于它和我们当前最长子串有重复，当前子串停止增长，我们需要记下这个子串，然后从下标为3的a重新开始统计子串。</p>
+<p>2、下面介绍一种最为简单的办法，直接上代码：</p>
+<pre><code>public static int lengthOfLongestSubstring(String s) {
+    if(s.length()==0)
+        return 0;
+    int maxlength=1,pre=1;
+    String substring,presubstring;
+    String[] arrays = s.split(&quot;&quot;);//把字符串拆分成一个个字符
+    presubstring=substring=arrays[0];
+    for(int i=1;i&lt;s.length();i++) {
+        int temp = substring.indexOf(arrays[i]);//判断字符是否在子串中出现过了，笔者使用了Java内置的函数，大家也可以自己实现。
+        if(temp==-1) {
+            substring=substring+arrays[i];
+            maxlength++;
+        }
+        else {
+            if(maxlength&gt;pre) {
+                presubstring=substring;
+                pre=maxlength;
+            }
+            i=i-(substring.length()-temp-1);
+            substring=arrays[i];//退回到发现重复子串的地方
+            maxlength=1;
+        }
+    }
+    //System.out.println(presubstring);
+    if(maxlength&gt;pre)
+        pre=maxlength;
+    return pre;
+}
+</code></pre><p> 提交运行，我们发现网站告诉提示，代码超时。是啊，以上代码没有任何巧妙之处，只是暴力遍历，话不多说，移步前往下面。</p>
+<p>3、我们每次发现重复子串都要往前移动，细心的同志发现了在substring中的元素是不重复的，我们没必要每次退回再去重复判断。这个小问题修改之后，代码如下：</p>
+<pre><code>public static int lengthOfLongestSubstring(String s) {
+    if(s.length()==0)
+        return 0;
+    int maxlength=1,pre=1;
+    String substring,presubstring;
+    String[] arrays = s.split(&quot;&quot;);//把字符串拆分成一个个字符
+    presubstring=substring=arrays[0];
+    for(int i=1;i&lt;s.length();i++) {
+        int temp = substring.indexOf(arrays[i]);//判断字符是否在子串中出现过了
+        if(temp==-1) {
+            substring=substring+arrays[i];
+            maxlength++;
+        }
+        else {
+            if(maxlength&gt;pre) {
+                presubstring=substring;
+                pre=maxlength;
+            }
+            int b=i-(substring.length()-temp-1);
+            substring=s.substring(b,i+1);//不用退回啦
+            maxlength=substring.length();
+        }
+    }
+    //System.out.println(presubstring);
+    if(maxlength&gt;pre)
+        pre=maxlength;
+    return pre;
+}
+</code></pre><p>  这下再提交，可以发现我们的答案被Accepted啦！</p>
+<p>3、再仔细观察，还有哪里可以改进呢。没错，就是大家想的那样，我们除了从头到尾遍历字符串之外，还要查找当前字符是否在子串中，如果我们可以做到查找是O（1）的，那么该算法的理论时间复杂度就可以达到O（n）啦。轻松一想，hash是一个不错的选择，拓展部分交给各位同志啦。</p>
+<p>欢迎大家指点，联系笔者：<a href="mailto:18804656964@163.com" target="_blank" rel="noopener">18804656964@163.com</a>,非常希望和各位一起共同进步。上述均属原创，欢迎转载，转载请注明哦。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/02/C-系列（一）/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -536,7 +726,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-count">3</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
